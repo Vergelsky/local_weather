@@ -18,12 +18,13 @@ from django.contrib import admin
 from django.urls import path
 
 from local_weather.apps import LocalWeatherConfig
-from local_weather.views import index, get_weather
+from local_weather.views import index, get_weather, cities_report
 
 app_name = LocalWeatherConfig.name
 
 urlpatterns = [
     path('', index, name='index'),
     path('get-weather/', get_weather, name='get-weather'),
+    path('cities-report/', cities_report, name='cities-report'),
 
 ]

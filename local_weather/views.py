@@ -1,6 +1,9 @@
+import json
+
 from django.shortcuts import render
 from django.http import JsonResponse
 
+from local_weather.models import City
 from local_weather.servises import get_weather_from_weatherapi
 
 
@@ -46,6 +49,13 @@ def get_weather(request):
         weather_dict['error']['code'] = 1006
         return JsonResponse({'error': 'no_city'})
 
+    city_to_add = City.objects.filter(name=city).first()
+    if city_to_add:
+        city_to_add.count += 1
+        city_to_add.save()
+    else:
+        City.objects.create(name=city, count=1)
+
     current_condition_code = weather_dict['current']['condition']['code']
     current_condition = CONDITIONS[current_condition_code]
     current_temp = weather_dict['current']['temp_c']
@@ -59,3 +69,8 @@ def get_weather(request):
                    f"В течении суток ожидается: температура воздуха {forecast_temp}°C, {forecast_condition}.",
     }
     return JsonResponse(data)
+
+
+def cities_report(request):
+    report = {city: count for city, count in City.objects.all().values_list('name', 'count')}
+    return JsonResponse(report)
