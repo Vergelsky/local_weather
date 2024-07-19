@@ -36,11 +36,26 @@
     </div>
 </div>
 
-<script>
+<!--<script>
     function showWeather() {
         let city = document.getElementById('inputDefault').value;
         document.getElementById('weatherHeader').textContent = `Погода на сегодня в ${city}`;
         document.getElementById('weatherText').textContent = `Сегодня в ${city} ожидается`;
+    }
+</script>-->
+<script>
+    function showWeather() {
+        var city = document.getElementById('inputDefault').value;
+        document.getElementById('weatherHeader').textContent = `Погода на сегодня в ${city}`
+
+        fetch(`http://127.0.0.1:8000/get-weather?city=${city}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('weatherText').textContent = `Сегодня в ${city} ожидается ${data.weather}`;
+            })
+            .catch(error => {
+                console.error('Произошла ошибка', error);
+            });
     }
 </script>
 </body>
