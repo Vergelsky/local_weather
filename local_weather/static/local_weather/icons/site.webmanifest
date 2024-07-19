@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Местная погода",
+    "short_name": "Погода",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
