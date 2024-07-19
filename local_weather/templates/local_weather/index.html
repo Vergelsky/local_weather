@@ -33,7 +33,7 @@
         <div>
             <label class="col-form-label col-form-label-lg mt-4" for="inputDefault">Введите город:</label>
             <input type="text" class="form-control form-control-lg" placeholder="Название населённого пункта"
-                   id="inputDefault" name="city">
+                   id="inputDefault" name="city" value="{% if last_city %}{{ last_city }}{% endif %}">
         </div>
         <button type="button" class="btn btn-primary" id="weatherButton" onclick="showWeather(event)">Узнать погоду
         </button>
@@ -41,10 +41,16 @@
 
     <div class="card border-primary mb-4" style="max-width: 100%;" id="weatherCard">
         <div class="card-body">
-            <h4 class="card-title" id="weatherHeader">Погода на сегодня</h4>
+            <h5 class="card-title" id="weatherHeader">Погода на сегодня</h5>
             <p class="card-text" id="weatherText">Введите город чтобы узнать прогноз</p>
         </div>
     </div>
+    {% if last_ten_cities %}
+    <div class="card-body mb-4">
+        <h6 class="text-body-tertiary">История запросов</h6>
+        <p class="text-body-tertiary">{% for city in last_ten_cities %}{{ city }}<br>{% endfor %}</p>
+    </div>
+    {% endif %}
 </div>
 
 </body>
