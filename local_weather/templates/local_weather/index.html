@@ -20,15 +20,15 @@
     <div class="page-header">
         <h1>Погода в вашем городе</h1>
     </div>
-    <form class="bs-component">
+    <form class="bs-component" id="weatherForm" onsubmit="showWeather(event)">
         <div>
             <label class="col-form-label col-form-label-lg mt-4" for="inputDefault">Введите город:</label>
             <input type="text" class="form-control form-control-lg" placeholder="Название населённого пункта"
                    id="inputDefault">
         </div>
-        <button type="button" class="btn btn-primary" onclick="showWeather()">Узнать погоду</button>
+        <button type="button" class="btn btn-primary" id="weatherButton" onclick="showWeather(event)">Узнать погоду</button>
     </form>
-    <div class="card border-primary mb-4" style="max-width: 100%;">
+    <div class="card border-primary mb-4" style="max-width: 100%;" id="weatherCard">
         <div class="card-body">
             <h4 class="card-title" id="weatherHeader">Погода на сегодня</h4>
             <p class="card-text" id="weatherText">Введите город чтобы узнать прогноз</p>
@@ -36,27 +36,44 @@
     </div>
 </div>
 
-<!--<script>
-    function showWeather() {
-        let city = document.getElementById('inputDefault').value;
-        document.getElementById('weatherHeader').textContent = `Погода на сегодня в ${city}`;
-        document.getElementById('weatherText').textContent = `Сегодня в ${city} ожидается`;
-    }
-</script>-->
 <script>
     function showWeather() {
+        event.preventDefault();
+
         var city = document.getElementById('inputDefault').value;
-        document.getElementById('weatherHeader').textContent = `Погода на сегодня в ${city}`
+
+        const weatherCard = document.getElementById('weatherCard');
+        const weatherHeader = document.getElementById('weatherHeader');
+        const weatherText = document.getElementById('weatherText');
+
+        if (!city) {
+            weatherCard.classList.add('alert', 'alert-dismissible', 'alert-warning');
+            weatherHeader.textContent = 'Ошибка!';
+            weatherText.textContent = 'Введите название города!';
+            return;
+        }
+
+        weatherHeader.textContent = `Погода на сегодня в ${city}`;
 
         fetch(`http://127.0.0.1:8000/get-weather?city=${city}`)
+            .then(response => {
+                                weatherText.textContent = 'Получение информации...';
+                                return response;
+            })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('weatherText').textContent = `Сегодня в ${city} ожидается ${data.weather}`;
+                if (data.error) {
+                    if (data.error == 'no_city') {
+                        weatherCard.classList.add('alert', 'alert-dismissible', 'alert-warning');
+                        weatherHeader.textContent = 'Ошибка!';
+                        weatherText.textContent = 'Город не найден! Проверьте правильность названия.';
+                    }
+                    console.error('Произошла ошибка', data.error);
+                } else {weatherText.innerHTML = data.weather}
             })
-            .catch(error => {
-                console.error('Произошла ошибка', error);
-            });
+            .catch(error => console.error('Произошла ошибка', error));
     }
+
 </script>
 </body>
 </html>
