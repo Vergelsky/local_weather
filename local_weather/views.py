@@ -48,23 +48,32 @@ def index(request):
 
 
 def get_weather(request):
+    # Получаем историю запросов
     city_history = request.COOKIES.get('city_history')
     city_history = json.loads(city_history) if city_history else []
 
     city = request.GET.get('city')
 
+    # Добавляем в историю запросов текущий запрос
     city_history.append(city)
 
+    # Получаем данные о погоде
     weather_dict = get_weather_from_weatherapi(city)
 
+    # Если от сервиса пришёл ответ с ошибкой 1006 - город не найден, возвращаем ошибку
+    # Если код -1 - не удалось подключиться к сервису
     if weather_dict.get('error'):
-        weather_dict['error']['code'] = 1006
-        return JsonResponse({'error': 'no_city'})
-
-    city_to_add = City.objects.filter(name=city).first()
-    if city_to_add:
-        city_to_add.count += 1
-        city_to_add.save()
+        error_code = weather_dict['error']['code']
+        match error_code:
+            case 1006:
+                return JsonResponse({'error': 'no_city'})
+            case -1:
+                return JsonResponse({'error': 'bad_connection'})
+    # Увеличиваем счётчик просмотров города
+    city_to_count = City.objects.filter(name=city).first()
+    if city_to_count:
+        city_to_count.count += 1
+        city_to_count.save()
     else:
         City.objects.create(name=city, count=1)
 
@@ -77,15 +86,19 @@ def get_weather(request):
     forecast_temp = weather_dict['forecast']['forecastday'][0]['day']['avgtemp_c']
 
     data = {
-        'weather': f"В городе {city} сейчас: температура воздуха {current_temp}°C, {current_condition}.<br>"
-                   f"В течении суток ожидается: температура воздуха {forecast_temp}°C, {forecast_condition}.",
+        'weather': f"В городе {city} сейчас:<br>"
+                   f"температура воздуха {current_temp}°C, {current_condition}.<br>"
+                   f"В течении суток ожидается:<br>"
+                   f"температура воздуха {forecast_temp}°C, {forecast_condition}.",
     }
 
     response = JsonResponse(data)
+    # Сохраняем у клиента историю его запросов
     response.set_cookie('city_history', json.dumps(city_history))
     return response
 
 
 def cities_report(request):
-    report = {city: count for city, count in City.objects.all().values_list('name', 'count')}
+    cities = City.objects.all().values_list('name', 'count')
+    report = {city: count for city, count in cities}
     return JsonResponse(report)

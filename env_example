@@ -1,0 +1,2 @@
+DJANGO_SECRET_KEY = 'django-insecure-abcdefg12344556778900'
+WEATHER_API_KEY = 'abcdefrevldvjflfkgjsdlfgj'

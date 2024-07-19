@@ -1,7 +1,6 @@
 import os
 
 import requests
-import json
 
 
 def get_weather_from_weatherapi(city):
@@ -14,6 +13,9 @@ def get_weather_from_weatherapi(city):
 
     url = f'http://api.weatherapi.com/v1/forecast.json?key={WEATHER_API_KEY}&q={city}&days=1&aqi=no&alerts=no'
 
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except Exception as e:
+        return {'error': {'code': -1, 'message': str(e)}}
 
     return response.json()
