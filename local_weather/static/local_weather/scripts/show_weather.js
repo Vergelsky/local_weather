@@ -28,7 +28,8 @@ function showWeather() {
                         weatherCard.classList.add('alert', 'alert-dismissible', 'alert-warning');
                         weatherHeader.textContent = 'Ошибка!';
                         weatherText.textContent = 'Город не найден! Проверьте правильность названия.';
-                    else if (data.error == 'bad_connection')
+                    }
+                    else if (data.error == 'bad_connection') {
                         weatherCard.classList.add('alert', 'alert-dismissible', 'alert-warning');
                         weatherHeader.textContent = 'Ошибка!';
                         weatherText.textContent = 'Ошибка соединения, попробуйте еще раз!';
